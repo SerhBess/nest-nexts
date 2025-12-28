@@ -7,20 +7,29 @@ import FormInput from '@/components/form/form-input/form-input';
 import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { AuthService } from '@/lib/services/auth-service/auth-service';
+import { ROUTES } from '@/lib/routes';
+import { useRouter } from 'next/navigation';
+
 type Props = ComponentPropsWithoutRef<'form'>;
 
 const LoginForm: FC<Props> = () => {
+  const router = useRouter();
+
+  const navigateToSignUp = () => router.push(ROUTES.register);
+
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<LoginSchema>({
     resolver: zodResolver(loginSchema),
   });
 
   const onSubmit = async (data: LoginSchema) => {
-    const register = await AuthService.login({ ...data, userName: 'Serh' });
-    console.log(register);
+    const res = await AuthService.login({ ...data });
+    if (res.user) {
+      router.push(ROUTES.home);
+    }
   };
   return (
     <form
@@ -40,6 +49,14 @@ const LoginForm: FC<Props> = () => {
         registration={register('password')}
       />
       <Button type="submit">Log in</Button>
+      <div className="flex items-center gap-3 text-center dark:text-white px-5">
+        <div className="flex-1 h-px bg-white/50 dark:bg-white"></div>
+        <span>or</span>
+        <div className="flex-1 h-px bg-white/50 dark:bg-white"></div>
+      </div>
+      <Button variant={'secondary'} onClick={navigateToSignUp} type="button">
+        Sign up
+      </Button>
     </form>
   );
 };

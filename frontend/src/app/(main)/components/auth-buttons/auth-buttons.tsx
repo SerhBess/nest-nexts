@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { ROUTES } from '@/lib/routes';
+import { selectAuthStoreUser, useAuthStore } from '@/store/auth/auth-store';
 import { useRouter } from 'next/navigation';
 import { ComponentPropsWithoutRef, FC } from 'react';
 
@@ -9,6 +10,8 @@ type Props = ComponentPropsWithoutRef<'div'>;
 
 const AuthButtons: FC<Props> = () => {
   const router = useRouter();
+
+  const user = useAuthStore(selectAuthStoreUser);
 
   const handleRoute = (direction: string) => {
     router.push(direction);
@@ -30,6 +33,7 @@ const AuthButtons: FC<Props> = () => {
       >
         Sign up
       </Button>
+      <pre>{user ? JSON.stringify(user, null, 2) : 'No user'}</pre>
     </div>
   );
 };

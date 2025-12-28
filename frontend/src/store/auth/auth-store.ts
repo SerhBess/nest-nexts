@@ -1,30 +1,29 @@
 import { User } from '@/lib/types/user-type';
-import { create } from 'zustand';
+import { createStore } from '@/store/utils/createStore';
+import { useStore as useZustandStore } from 'zustand';
 
 type State = {
   user: User | null;
 };
 
-type Action = {
+type Actions = {
   setUser: (user: User) => void;
 };
 
-const authStore = create<State & Action>((set) => ({
+export type AuthStore = State & Actions;
+
+const store = createStore<AuthStore>('authStore', (set) => ({
   user: null,
 
   setUser: (newUser) =>
-    set((state) => {
-      if (!state.user) {
-        return { user: newUser };
-      }
-
-      return {
-        user: {
-          ...state.user,
-          ...newUser,
-        },
-      };
-    }),
+    set((state) => ({
+      user: state.user ? { ...state.user, ...newUser } : newUser,
+    })),
 }));
 
-export default authStore;
+export const useAuthStore = <T>(selector: (state: AuthStore) => T) =>
+  useZustandStore(store, selector);
+
+export const selectAuthStoreUser = (s: AuthStore) => s.user;
+
+export default store;
